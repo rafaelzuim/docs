@@ -1,48 +1,41 @@
-Entities
+Entidades
 ########
 
 .. php:namespace:: Cake\ORM
 
 .. php:class:: Entity
 
-While :doc:`/orm/table-objects` represent and provide access to a collection of
-objects, entities represent individual rows or domain objects in your
-application. Entities contain persistent properties and methods to manipulate and
-access the data they contain.
+Enquanto :doc:`/orm/table-objects` representam e promovem acesso à coleções de objetos, entidades representam linhas individuais ou objetos do domínio na sua aplicação. Entidades possuem propriedades persistentes e métodos para manipular e acessar a informação contida nelas.
 
-Entities are created for you by CakePHP each time you use ``find()`` on a table
-object.
+Entidades são criadas para você, pelo CakePHP cada vez que você usa  ``find()`` em um objeto Tabela.
 
-Creating Entity Classes
-=======================
+Criando uma Classe do tipo Entidades
+====================================
 
-You don't need to create entity classes to get started with the ORM in CakePHP.
-However, if you want to have custom logic in your entities you will need to
-create classes. By convention entity classes live in **src/Model/Entity/**. If
+VocÊ não precisa  criar uma classe do tipo entidade para começar a  utilizar ORM. De qualquer maneira, se você deseja ter uma lógica própria em suas entidades você precisará criar classes. Por conveção, as classes do tipo entity ficam em **src/Model/Entity/**. Se a sua aplicação possui uma tabela chamada ``artigos`` nós precisamos criar a seguinte entidade::
 our application had an ``articles`` table we could create the following entity::
 
-    // src/Model/Entity/Article.php
+    // src/Model/Entity/Artigo.php
     namespace App\Model\Entity;
 
     use Cake\ORM\Entity;
 
-    class Article extends Entity
+    class Artigo extends Entity
     {
     }
 
-Right now this entity doesn't do very much. However, when we load data from our
-articles table, we'll get instances of this class.
+Por hora esta entidade não faz muita coisa. De qualquer maneira,quando nós carregamos dados da tabela artigos, nnós teremos uma instância desta classe.
+
 
 .. note::
+    Se você não definir uma classe do tipo entidade CakePHP vai utilizar uma classe padrão do tipo entidade.    
 
-    If you don't define an entity class CakePHP will use the basic Entity class.
-
-Creating Entities
+Criando entidades
 =================
 
-Entities can be directly instantiated::
+Entidades podem ser instânciadas diretamente::
 
-    use App\Model\Entity\Article;
+    use App\Model\Entity\Artigos;
 
     $article = new Article();
 
@@ -51,106 +44,91 @@ to store in them::
 
     use App\Model\Entity\Article;
 
-    $article = new Article([
+    $artigo = new Artigo([
         'id' => 1,
-        'title' => 'New Article',
+        'title' => 'Novo artigo',
         'created' => new DateTime('now')
     ]);
 
-Another way of getting new entities is using the ``newEntity()`` method from the
-``Table`` objects::
+Uma outra maneira de criar novas entidades é utilizando o método ``newEntity()`` dos objetos do tipo ``Table``::
 
     use Cake\ORM\TableRegistry;
 
-    $article = TableRegistry::get('Articles')->newEntity();
-    $article = TableRegistry::get('Articles')->newEntity([
+    $article = TableRegistry::get('Artigos')->newEntity();
+    $article = TableRegistry::get('Artigos')->newEntity([
         'id' => 1,
-        'title' => 'New Article',
+        'title' => 'Novo Artigo',
         'created' => new DateTime('now')
     ]);
 
-Accessing Entity Data
+Acessando os dados da entidade
 =====================
 
-Entities provide a few ways to access the data they contain. Most commonly you
-will access the data in an entity using object notation::
+Entidades disponibilizam alguns caminhos para acessar a informação nelas contidas. O mais comum é utilizar a notação de objeto para acessar os dados::
 
-    use App\Model\Entity\Article;
+    use App\Model\Entity\Artigo;
 
-    $article = new Article;
-    $article->title = 'This is my first post';
+    $article = new Artigo;
+    $article->title = 'Este é meu primeiro post';
     echo $article->title;
 
-You can also use the ``get()`` and ``set()`` methods::
+Você também pode utilizar os métodos ``get()`` e ``set()``::
 
-    $article->set('title', 'This is my first post');
+    $article->set('title', 'Este é meu primeiro post');
     echo $article->get('title');
 
-When using ``set()`` you can update multiple properties at once using an array::
+Quando utilizar ``set()`` você pode atualizar várias propriedades ao mesmo tempo usando um array::
 
     $article->set([
-        'title' => 'My first post',
-        'body' => 'It is the best ever!'
+        'title' => 'Meu primeiro post',
+        'body' => 'Isto é o melhor de tudo!'
     ]);
 
-.. warning::
+.. cuidado::
+       
+    Ao atualizar entidades com dados de uma requisição, você precisa definir a lista autorizada de quais campos você vai permiti  ser informados via atribuição em massa.    
 
-    When updating entities with request data you should whitelist which fields
-    can be set with mass assignment.
-
-Accessors & Mutators
+Acessores & Mutadores
 ====================
 
-In addition to the simple get/set interface, entities allow you to provide
-accessors and mutator methods. These methods let you customize how properties
-are read or set.
+Em adicção a interface simples dos métodos simples get/set, entidades pemitem que você provenha métodos acessores e mutadores. Estes métodos lhe permitem definir como os as propriedades da entidade são escritas ou lidas.
 
-Accessors use the convention of ``_get`` followed by the CamelCased version of
-the field name.
+Acessores usam a convenção ``_get`` seguido do nome do campo no padrão CamelCase.
 
 .. php:method:: get($field)
 
-They receive the basic value stored in the ``_properties`` array
-as their only argument. Accessors will be used when saving entities, so be
-careful when defining methods that format data, as the formatted data will be
-persisted. For example::
+Eles recebem o valor padrão armazenado no array ``_properties`` como seu único argumento. Acessores serão utilizados quando salvarmos as entidades, então tenha cuidado ao definir métodos que formatam os dados, pois eles persistiram formatados no momento de persistir a entidade. Por exemplo::
 
     namespace App\Model\Entity;
 
     use Cake\ORM\Entity;
 
-    class Article extends Entity
+    class Artigos extends Entity
     {
         protected function _getTitle($title)
         {
             return ucwords($title);
         }
     }
-
-The accessor would be run when getting the property through any of these two ways::
+O acessor estaria rodando quando pegamos a propriedade através de qualquer um dos caminhos::
 
     echo $user->title;
     echo $user->get('title');
 
-You can customize how properties get set by defining a mutator:
+Você pode customizar como as propriedades são ldias e escritas definindo um mutador:
 
 .. php:method:: set($field = null, $value = null)
 
-Mutator methods should always return the value that should be stored in the
-property. As you can see above, you can also use mutators to set other
-calculated properties. When doing this, be careful to not introduce any loops,
-as CakePHP will not prevent infinitely looping mutator methods.
+Métodos mutadores devem sempre retornar o valor que deve ser salvo na propriedade. Como você pode ver abaixo, você também pode utilizar mutadores para setar outras propriedades calculadas. Quando estiver fazendo isso, seja cuidadoso para não introduzir nenhum laço, pois o CakePHP não previne métodos com laços infinitos..
 
-Mutators allow you to convert properties as they are set, or create calculated
-data. Mutators and accessors are applied when properties are read using object
-notation, or using ``get()`` and ``set()``. For example::
+Mutadores permitem a você converter propriedades como elas são setadas, ou criar dados calculados. Mutadores e acessores são aplicados quando as propriedades são lidas usando a notação de objeto, ou utilizando os métodos ``get()`` e ``set()``. Por exemplo::
 
     namespace App\Model\Entity;
 
     use Cake\ORM\Entity;
     use Cake\Utility\Text;
 
-    class Article extends Entity
+    class Artigo extends Entity
     {
 
         protected function _setTitle($title)
@@ -160,46 +138,39 @@ notation, or using ``get()`` and ``set()``. For example::
         }
 
     }
-
-The mutator would be run when setting the property through any of these two
-ways::
+O mutador seria inicializado quando setarmos a propriedade através de qualquer um dos caminhos a segui::
 
     $user->title = 'foo'; // slug is set as well
     $user->set('title', 'foo'); // slug is set as well
 
 .. _entities-virtual-properties:
 
-Creating Virtual Fields
+Criando campos virtuais
 -----------------------
-
-By defining accessors you can provide access to fields/properties that do not
-actually exist. For example if your users table has ``first_name`` and
-``last_name`` you could create a method for the full name::
+Definindo acessores você pode ter acesso a campos/propriedades qua na realidade não existem. Por exemplo se a sua tabela de usuários possui os campos ``primeiro_nome`` and ``ultimo_nome`` você pode criar o método para ler o nome completo::
 
     namespace App\Model\Entity;
 
     use Cake\ORM\Entity;
 
-    class User extends Entity
+    class Usuario extends Entity
     {
 
-        protected function _getFullName()
+        protected function _getNomeCompleto()
         {
-            return $this->_properties['first_name'] . '  ' .
-                $this->_properties['last_name'];
+            return $this->_properties['primeiro_nome'] . '  ' .
+                $this->_properties['ultimo_nome'];
         }
 
     }
+Você pode acessar campos virtuais comose ele existisse realmente na entidade. O nome da propriedade será o nome da método em letras minúsculas e utilizando underscore para serparar as palavras.
 
-You can access virtual fields as if they existed on the entity. The property
-name will be the lower case and underscored version of the method::
+    echo $user->nome_completo;
 
-    echo $user->full_name;
-
-Do bear in mind that virtual fields cannot be used in finds.
+Tenha em mente que campos virtuais não podem ser utilizados para efetuar buscas.
 
 
-Checking if an Entity Has Been Modified
+Checando se uma entidade foi modificada
 ========================================
 
 .. php:method:: dirty($field = null, $dirty = null)
